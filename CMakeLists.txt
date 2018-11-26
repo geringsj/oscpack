@@ -30,12 +30,11 @@ ELSE()
 
 	IF(WIN32)
 	 set(IpSystemTypePath ip/win32)
-	 set(LIBS ${LIBS} Ws2_32 winmm)
 	ELSE(WIN32)
 	 set(IpSystemTypePath ip/posix)
 	ENDIF(WIN32)
 
-	ADD_LIBRARY(oscpack 
+	ADD_LIBRARY(oscpack STATIC
 
 	ip/IpEndpointName.h
 	ip/IpEndpointName.cpp
@@ -63,7 +62,12 @@ ELSE()
 	osc/OscOutboundPacketStream.cpp
 
 	)
-
+	
+	target_include_directories(oscpack PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
+	IF(WIN32)
+	 #set(LIBS ${LIBS} Ws2_32 winmm)
+	 target_link_libraries(oscpack PRIVATE Ws2_32 winmm)
+	ENDIF(WIN32)
 
 	ADD_EXECUTABLE(OscUnitTests tests/OscUnitTests.cpp)
 	TARGET_LINK_LIBRARIES(OscUnitTests oscpack ${LIBS})
@@ -83,6 +87,14 @@ ELSE()
 
 	ADD_EXECUTABLE(SimpleSend examples/SimpleSend.cpp)
 	TARGET_LINK_LIBRARIES(SimpleSend oscpack ${LIBS})
+	
+	
+	target_include_directories(OscUnitTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
+	target_include_directories(OscSendTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
+	target_include_directories(OscReceiveTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
+	target_include_directories(OscDump PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
+	target_include_directories(SimpleReceive PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
+	target_include_directories(SimpleSend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/ip ${CMAKE_CURRENT_SOURCE_DIR}/osc)
 
 
 	if(MSVC)
